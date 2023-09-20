@@ -594,8 +594,35 @@ public extension Int {
     }
 }
 
+public class KVDateFormatter: NSObject {
+    public static var dateFormatter: DateFormatter {
+        let dateFormatForm = DateFormatter() // RFC3339DateFormatter
+        dateFormatForm.locale = Locale.posix
+        dateFormatForm.dateFormat = DateTimeFormat.yyyyMMdd_T_HHmmssZZZZZ.rawValue
+        dateFormatForm.timeZone = TimeZone(secondsFromGMT: 0)
+        return dateFormatForm
+    }
+}
+
 // MARK: - Utils
 public extension Date {
+    func kvFormatedDate() -> String {
+        return KVDateFormatter.dateFormatter.string(from: self)
+    }
+    
+    func kvTimestamp() -> Int64 {
+        return Int64(self.timeStamp)
+    }
+    
+    var timeStamp: Double {
+        return Double((self.timeIntervalSince1970) * 1_000).rounded()
+    }
+    
+    init(timeStamp: Double) {
+        self = Date(timeIntervalSince1970: TimeInterval(timeStamp / 1_000))
+    }
+
+    
     /// Đưa về thành giờ UTC
     func toStringUTC(withFormat format: DateTimeFormat? = nil) -> String? {
         let dateFormatter = DateFormatter()
